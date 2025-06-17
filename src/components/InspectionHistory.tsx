@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, Eye, Download } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Search, Filter, Eye, Download, X } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface InspectionRecord {
@@ -19,14 +19,17 @@ interface InspectionRecord {
   subcontractor: string;
   inspector: string;
   actions: string[];
+  originalImage?: string;
+  clickedImage?: string;
 }
 
 export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: (inspection: any) => void }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [selectedImages, setSelectedImages] = useState<{ posterId: string; originalImage: string; clickedImage: string } | null>(null);
 
-  // Mock data for demonstration
+  // Mock data for demonstration with image URLs
   const inspections: InspectionRecord[] = [
     {
       id: 'INS-001',
@@ -38,7 +41,9 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
       department: 'Quality Control',
       subcontractor: 'Metro Displays Inc.',
       inspector: 'Sarah Johnson',
-      actions: ['Notify Sub', 'Schedule Repair']
+      actions: ['Notify Sub', 'Schedule Repair'],
+      originalImage: '/placeholder.svg',
+      clickedImage: '/placeholder.svg'
     },
     {
       id: 'INS-002',
@@ -49,7 +54,9 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
       department: 'Quality Control',
       subcontractor: 'Urban Vision Co.',
       inspector: 'Mike Chen',
-      actions: ['Report Generated']
+      actions: ['Report Generated'],
+      originalImage: '/placeholder.svg',
+      clickedImage: '/placeholder.svg'
     },
     {
       id: 'INS-003',
@@ -61,7 +68,9 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
       department: 'Site Management',
       subcontractor: 'Metro Displays Inc.',
       inspector: 'Sarah Johnson',
-      actions: ['Notify Sub', 'Site Visit Required']
+      actions: ['Notify Sub', 'Site Visit Required'],
+      originalImage: '/placeholder.svg',
+      clickedImage: '/placeholder.svg'
     },
     {
       id: 'INS-004',
@@ -73,7 +82,9 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
       department: 'Quality Control',
       subcontractor: 'Premium Posters Ltd.',
       inspector: 'Alex Rivera',
-      actions: ['Additional Sub Order', 'Training Required']
+      actions: ['Additional Sub Order', 'Training Required'],
+      originalImage: '/placeholder.svg',
+      clickedImage: '/placeholder.svg'
     },
     {
       id: 'INS-005',
@@ -84,7 +95,9 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
       department: 'Quality Control',
       subcontractor: 'Urban Vision Co.',
       inspector: 'Sarah Johnson',
-      actions: ['Report Generated']
+      actions: ['Report Generated'],
+      originalImage: '/placeholder.svg',
+      clickedImage: '/placeholder.svg'
     }
   ];
 
@@ -109,6 +122,14 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
   const handleViewDetails = (inspection: InspectionRecord) => {
     onInspectionSelect(inspection);
     console.log('Viewing details for:', inspection.id);
+  };
+
+  const handlePosterIdClick = (inspection: InspectionRecord) => {
+    setSelectedImages({
+      posterId: inspection.posterId,
+      originalImage: inspection.originalImage || '/placeholder.svg',
+      clickedImage: inspection.clickedImage || '/placeholder.svg'
+    });
   };
 
   return (
@@ -207,7 +228,12 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
               {filteredInspections.map((inspection) => (
                 <TableRow key={inspection.id} className="hover:bg-gray-50">
                   <TableCell className="font-medium text-blue-600">
-                    {inspection.posterId}
+                    <button
+                      onClick={() => handlePosterIdClick(inspection)}
+                      className="hover:underline cursor-pointer"
+                    >
+                      {inspection.posterId}
+                    </button>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
@@ -264,6 +290,43 @@ export const InspectionHistory = ({ onInspectionSelect }: { onInspectionSelect: 
           </Table>
         </CardContent>
       </Card>
+
+      {/* Image Dialog */}
+      <Dialog open={!!selectedImages} onOpenChange={(open) => !open && setSelectedImages(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              Image Comparison - {selectedImages?.posterId}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedImages && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-700">Original Image</h3>
+                <div className="border rounded-lg overflow-hidden bg-gray-50">
+                  <img
+                    src={selectedImages.originalImage}
+                    alt="Original poster"
+                    className="w-full h-64 object-contain"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-700">Clicked Image</h3>
+                <div className="border rounded-lg overflow-hidden bg-gray-50">
+                  <img
+                    src={selectedImages.clickedImage}
+                    alt="Clicked poster"
+                    className="w-full h-64 object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {filteredInspections.length === 0 && (
         <Card className="bg-gray-50">
