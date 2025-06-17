@@ -5,17 +5,23 @@ import { InspectionHistory } from '@/components/InspectionHistory';
 import { ImageComparison } from '@/components/ImageComparison';
 import { DashboardStats } from '@/components/DashboardStats';
 import { Navigation } from '@/components/Navigation';
+import { ImageUploadSidebar } from '@/components/ImageUploadSidebar';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Index = () => {
   const [selectedInspection, setSelectedInspection] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <Navigation />
+      <Navigation onToggleSidebar={toggleSidebar} />
       
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className={`container mx-auto px-4 py-6 space-y-6 transition-all duration-300 ${isSidebarOpen ? 'mr-96' : ''}`}>
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -62,6 +68,17 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Image Upload Sidebar */}
+      <ImageUploadSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
+      {/* Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-20 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 };
