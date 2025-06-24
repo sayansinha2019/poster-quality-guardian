@@ -6,6 +6,7 @@ import { ImageComparison } from '@/components/ImageComparison';
 import { DashboardStats } from '@/components/DashboardStats';
 import { Navigation } from '@/components/Navigation';
 import { ImageUploadSidebar } from '@/components/ImageUploadSidebar';
+import { Chatbot } from '@/components/Chatbot';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -79,6 +80,9 @@ const Index = () => {
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
+
+      {/* Chatbot */}
+      <Chatbot />
     </div>
   );
 };
